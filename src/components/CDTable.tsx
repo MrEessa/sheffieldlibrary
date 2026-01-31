@@ -79,7 +79,7 @@ export function CDTable({ items }: CDTableProps) {
     }
   };
 
-  const SortIcon = ({ field }: { field: SortField }) => {
+  const getSortIcon = (field: SortField) => {
     if (sortField !== field) return <ArrowUpDown className="ml-2 h-4 w-4" />;
     return sortDirection === 'asc' ? (
       <ArrowUp className="ml-2 h-4 w-4" />
@@ -171,7 +171,7 @@ export function CDTable({ items }: CDTableProps) {
                   className="-ml-4 font-semibold"
                 >
                   Title
-                  <SortIcon field="title" />
+                  {getSortIcon('title')}
                 </Button>
               </TableHead>
               <TableHead>
@@ -181,7 +181,7 @@ export function CDTable({ items }: CDTableProps) {
                   className="-ml-4 font-semibold"
                 >
                   Author/Artist
-                  <SortIcon field="author" />
+                  {getSortIcon('author')}
                 </Button>
               </TableHead>
               <TableHead className="w-24">
@@ -191,7 +191,7 @@ export function CDTable({ items }: CDTableProps) {
                   className="-ml-4 font-semibold"
                 >
                   Year
-                  <SortIcon field="year" />
+                  {getSortIcon('year')}
                 </Button>
               </TableHead>
               <TableHead className="w-36">
@@ -201,7 +201,7 @@ export function CDTable({ items }: CDTableProps) {
                   className="-ml-4 font-semibold"
                 >
                   ISBN
-                  <SortIcon field="isbn" />
+                  {getSortIcon('isbn')}
                 </Button>
               </TableHead>
               <TableHead className="w-20 text-center">Link</TableHead>
