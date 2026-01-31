@@ -7,12 +7,13 @@ export function useRSSFeed() {
   const [items, setItems] = useState<CDItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<{ totalFeeds: number; duplicatesRemoved: number } | null>(null);
 
-  const fetchFeed = async (url: string, fetchAll: boolean = false) => {
-    if (!url.trim()) {
+  const fetchFeed = async (urls: string[], fetchAll: boolean = false) => {
+    if (urls.length === 0) {
       toast({
         title: 'Error',
-        description: 'Please enter a valid RSS feed URL',
+        description: 'Please enter at least one RSS feed URL',
         variant: 'destructive',
       });
       return;
@@ -20,28 +21,58 @@ export function useRSSFeed() {
 
     setIsLoading(true);
     setError(null);
+    setStats(null);
 
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('fetch-rss', {
-        body: { url, fetchAll },
-      });
+      const allItems: CDItem[] = [];
+      const seenLinks = new Set<string>();
+      let totalRawItems = 0;
 
-      if (fnError) {
-        throw new Error(fnError.message);
+      for (let i = 0; i < urls.length; i++) {
+        const url = urls[i];
+        
+        toast({
+          title: 'Loading...',
+          description: `Fetching feed ${i + 1} of ${urls.length}`,
+        });
+
+        const { data, error: fnError } = await supabase.functions.invoke('fetch-rss', {
+          body: { url, fetchAll },
+        });
+
+        if (fnError) {
+          console.error(`Error fetching feed ${i + 1}:`, fnError);
+          continue;
+        }
+
+        if (data.error) {
+          console.error(`Feed ${i + 1} error:`, data.error);
+          continue;
+        }
+
+        totalRawItems += data.items.length;
+
+        // Deduplicate across all feeds
+        for (const item of data.items) {
+          const uniqueKey = item.link || `${item.title}-${item.author}`;
+          if (!seenLinks.has(uniqueKey)) {
+            seenLinks.add(uniqueKey);
+            allItems.push(item);
+          }
+        }
       }
 
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      setItems(data.items);
-      const pagesMsg = data.pages > 1 ? ` (${data.pages} pages)` : '';
+      const duplicatesRemoved = totalRawItems - allItems.length;
+      
+      setItems(allItems);
+      setStats({ totalFeeds: urls.length, duplicatesRemoved });
+      
       toast({
         title: 'Success',
-        description: `Loaded ${data.items.length} items from the feed${pagesMsg}`,
+        description: `Loaded ${allItems.length} unique items from ${urls.length} feed${urls.length !== 1 ? 's' : ''}${duplicatesRemoved > 0 ? ` (${duplicatesRemoved} duplicates removed)` : ''}`,
       });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load feed';
+      const message = err instanceof Error ? err.message : 'Failed to load feeds';
       setError(message);
       toast({
         title: 'Error',
@@ -53,5 +84,5 @@ export function useRSSFeed() {
     }
   };
 
-  return { items, isLoading, error, fetchFeed };
+  return { items, isLoading, error, stats, fetchFeed };
 }

@@ -3,20 +3,61 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, Plus, X } from 'lucide-react';
 
 interface RSSInputProps {
-  onFetch: (url: string, fetchAll: boolean) => void;
+  onFetch: (urls: string[], fetchAll: boolean) => void;
   isLoading: boolean;
 }
 
 export function RSSInput({ onFetch, isLoading }: RSSInputProps) {
-  const [url, setUrl] = useState('');
+  const [currentUrl, setCurrentUrl] = useState('');
+  const [urls, setUrls] = useState<string[]>([]);
   const [fetchAll, setFetchAll] = useState(true);
+
+  const handleAddUrl = () => {
+    if (currentUrl.trim() && !urls.includes(currentUrl.trim())) {
+      setUrls([...urls, currentUrl.trim()]);
+      setCurrentUrl('');
+    }
+  };
+
+  const handleRemoveUrl = (urlToRemove: string) => {
+    setUrls(urls.filter(url => url !== urlToRemove));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddUrl();
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onFetch(url, fetchAll);
+    const allUrls = currentUrl.trim() 
+      ? [...urls, currentUrl.trim()]
+      : urls;
+    
+    if (allUrls.length > 0) {
+      onFetch(allUrls, fetchAll);
+    }
+  };
+
+  const getUrlLabel = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      const params = urlObj.pathname + urlObj.search;
+      // Extract a meaningful label from the URL
+      const lmMatch = params.match(/lm=([^&]+)/);
+      if (lmMatch) {
+        return lmMatch[1].replace(/\+?\|\|/g, ', ').substring(0, 30) + (lmMatch[1].length > 30 ? '...' : '');
+      }
+      return url.substring(0, 50) + '...';
+    } catch {
+      return url.substring(0, 50) + '...';
+    }
   };
 
   return (
@@ -24,23 +65,55 @@ export function RSSInput({ onFetch, isLoading }: RSSInputProps) {
       <div className="flex gap-3">
         <Input
           type="url"
-          placeholder="Paste your RSS feed URL here..."
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Paste an RSS feed URL and press Enter or click + to add..."
+          value={currentUrl}
+          onChange={(e) => setCurrentUrl(e.target.value)}
+          onKeyDown={handleKeyDown}
           className="flex-1"
           disabled={isLoading}
         />
-        <Button type="submit" disabled={isLoading || !url.trim()}>
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={handleAddUrl}
+          disabled={isLoading || !currentUrl.trim()}
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+        <Button type="submit" disabled={isLoading || (urls.length === 0 && !currentUrl.trim())}>
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Loading...
             </>
           ) : (
-            'Load Feed'
+            'Load Feeds'
           )}
         </Button>
       </div>
+
+      {urls.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {urls.map((url, index) => (
+            <Badge 
+              key={index} 
+              variant="secondary" 
+              className="flex items-center gap-1 max-w-xs"
+            >
+              <span className="truncate text-xs">{getUrlLabel(url)}</span>
+              <button
+                type="button"
+                onClick={() => handleRemoveUrl(url)}
+                className="ml-1 hover:bg-muted rounded-full p-0.5"
+                disabled={isLoading}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
+
       <div className="flex items-center space-x-2">
         <Checkbox
           id="fetchAll"
@@ -49,9 +122,15 @@ export function RSSInput({ onFetch, isLoading }: RSSInputProps) {
           disabled={isLoading}
         />
         <Label htmlFor="fetchAll" className="text-sm text-muted-foreground cursor-pointer">
-          Load all records (may take longer for large catalogs)
+          Load all records from each feed (may take longer for large catalogs)
         </Label>
       </div>
+
+      {urls.length > 0 && (
+        <p className="text-xs text-muted-foreground">
+          {urls.length} feed{urls.length !== 1 ? 's' : ''} queued. Results will be combined and deduplicated.
+        </p>
+      )}
     </form>
   );
 }
