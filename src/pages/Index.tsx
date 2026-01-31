@@ -1,11 +1,53 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { RSSInput } from '@/components/RSSInput';
+import { CDTable } from '@/components/CDTable';
+import { useRSSFeed } from '@/hooks/useRSSFeed';
+import { Disc3 } from 'lucide-react';
 
 const Index = () => {
+  const { items, isLoading, fetchFeed } = useRSSFeed();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background p-4 md:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <Disc3 className="h-8 w-8 text-primary" />
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Library CD Browser</h1>
+            <p className="text-muted-foreground">Search and browse audio CDs from your library's RSS feed</p>
+          </div>
+        </div>
+
+        {/* RSS Input Card */}
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg">Load RSS Feed</CardTitle>
+            <CardDescription>
+              Paste your library's RSS feed URL to load the audio CD catalog
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RSSInput onFetch={fetchFeed} isLoading={isLoading} />
+          </CardContent>
+        </Card>
+
+        {/* Results Table */}
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg">
+              Catalog Results
+              {items.length > 0 && (
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  ({items.length} items)
+                </span>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CDTable items={items} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
