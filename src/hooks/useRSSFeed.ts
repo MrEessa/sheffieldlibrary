@@ -8,7 +8,7 @@ export function useRSSFeed() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchFeed = async (url: string) => {
+  const fetchFeed = async (url: string, fetchAll: boolean = false) => {
     if (!url.trim()) {
       toast({
         title: 'Error',
@@ -23,7 +23,7 @@ export function useRSSFeed() {
 
     try {
       const { data, error: fnError } = await supabase.functions.invoke('fetch-rss', {
-        body: { url },
+        body: { url, fetchAll },
       });
 
       if (fnError) {
@@ -35,9 +35,10 @@ export function useRSSFeed() {
       }
 
       setItems(data.items);
+      const pagesMsg = data.pages > 1 ? ` (${data.pages} pages)` : '';
       toast({
         title: 'Success',
-        description: `Loaded ${data.items.length} items from the feed`,
+        description: `Loaded ${data.items.length} items from the feed${pagesMsg}`,
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to load feed';

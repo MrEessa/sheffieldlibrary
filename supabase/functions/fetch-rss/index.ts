@@ -14,6 +14,9 @@ interface CDItem {
   link: string;
 }
 
+const PAGE_SIZE = 300;
+const MAX_PAGES = 50; // Safety limit to prevent infinite loops
+
 function decodeHtmlEntities(text: string): string {
   return text
     .replace(/&lt;/g, '<')
@@ -98,25 +101,16 @@ function parseAtomFeed(xml: string): CDItem[] {
   return items;
 }
 
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+function buildPaginatedUrl(baseUrl: string, startRow: number): string {
+  const url = new URL(baseUrl);
+  // Set page size to max (300) and starting row
+  url.searchParams.set('ps', String(PAGE_SIZE));
+  url.searchParams.set('rw', String(startRow));
+  return url.toString();
+}
 
+async function fetchPage(url: string): Promise<{ items: CDItem[]; success: boolean }> {
   try {
-    const { url } = await req.json();
-    
-    if (!url) {
-      return new Response(
-        JSON.stringify({ error: 'RSS feed URL is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log(`Fetching RSS feed from: ${url}`);
-    
-    // Fetch the RSS feed
     const response = await fetch(url, {
       headers: {
         'Accept': 'application/atom+xml, application/rss+xml, application/xml, text/xml',
@@ -125,22 +119,93 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      console.error(`Failed to fetch RSS feed: ${response.status} ${response.statusText}`);
-      return new Response(
-        JSON.stringify({ error: `Failed to fetch RSS feed: ${response.statusText}` }),
-        { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      console.error(`Failed to fetch: ${response.status}`);
+      return { items: [], success: false };
     }
 
     const xml = await response.text();
-    console.log(`Received ${xml.length} bytes of XML`);
-    
-    // Parse the Atom feed
     const items = parseAtomFeed(xml);
-    console.log(`Parsed ${items.length} items from feed`);
+    return { items, success: true };
+  } catch (error) {
+    console.error('Error fetching page:', error);
+    return { items: [], success: false };
+  }
+}
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  try {
+    const { url, fetchAll = false } = await req.json();
+    
+    if (!url) {
+      return new Response(
+        JSON.stringify({ error: 'RSS feed URL is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log(`Fetching RSS feed from: ${url}, fetchAll: ${fetchAll}`);
+    
+    if (!fetchAll) {
+      // Single page fetch (original behavior)
+      const { items, success } = await fetchPage(url);
+      
+      if (!success) {
+        return new Response(
+          JSON.stringify({ error: 'Failed to fetch RSS feed' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log(`Parsed ${items.length} items from feed`);
+      return new Response(
+        JSON.stringify({ items, total: items.length, pages: 1 }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Fetch all pages
+    const allItems: CDItem[] = [];
+    let currentPage = 1;
+    let startRow = 1;
+    
+    while (currentPage <= MAX_PAGES) {
+      const paginatedUrl = buildPaginatedUrl(url, startRow);
+      console.log(`Fetching page ${currentPage}, starting at row ${startRow}`);
+      
+      const { items, success } = await fetchPage(paginatedUrl);
+      
+      if (!success) {
+        console.error(`Failed to fetch page ${currentPage}`);
+        break;
+      }
+      
+      console.log(`Page ${currentPage}: got ${items.length} items`);
+      
+      if (items.length === 0) {
+        // No more results
+        break;
+      }
+      
+      allItems.push(...items);
+      
+      if (items.length < PAGE_SIZE) {
+        // Last page (fewer results than page size)
+        break;
+      }
+      
+      startRow += PAGE_SIZE;
+      currentPage++;
+    }
+
+    console.log(`Total: ${allItems.length} items across ${currentPage} pages`);
 
     return new Response(
-      JSON.stringify({ items, total: items.length }),
+      JSON.stringify({ items: allItems, total: allItems.length, pages: currentPage }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
