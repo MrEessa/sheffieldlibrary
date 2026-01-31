@@ -5,7 +5,7 @@ import { useRSSFeed } from '@/hooks/useRSSFeed';
 import { Disc3 } from 'lucide-react';
 
 const Index = () => {
-  const { items, isLoading, fetchFeed } = useRSSFeed();
+  const { items, isLoading, stats, fetchFeed } = useRSSFeed();
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
@@ -15,16 +15,16 @@ const Index = () => {
           <Disc3 className="h-8 w-8 text-primary" />
           <div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Library CD Browser</h1>
-            <p className="text-muted-foreground">Search and browse audio CDs from your library's RSS feed</p>
+            <p className="text-muted-foreground">Search and browse audio CDs from your library's RSS feeds</p>
           </div>
         </div>
 
         {/* RSS Input Card */}
         <Card>
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg">Load RSS Feed</CardTitle>
+            <CardTitle className="text-lg">Load RSS Feeds</CardTitle>
             <CardDescription>
-              Paste your library's RSS feed URL to load the audio CD catalog
+              Add one or more RSS feed URLs. Results will be combined and deduplicated.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -39,7 +39,9 @@ const Index = () => {
               Catalog Results
               {items.length > 0 && (
                 <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  ({items.length} items)
+                  ({items.length} unique items
+                  {stats && stats.totalFeeds > 1 && ` from ${stats.totalFeeds} feeds`}
+                  {stats && stats.duplicatesRemoved > 0 && `, ${stats.duplicatesRemoved} duplicates removed`})
                 </span>
               )}
             </CardTitle>
