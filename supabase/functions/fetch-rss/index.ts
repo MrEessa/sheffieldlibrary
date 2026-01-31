@@ -168,10 +168,12 @@ serve(async (req) => {
       );
     }
 
-    // Fetch all pages
+    // Fetch all pages with deduplication
+    const seenLinks = new Set<string>();
     const allItems: CDItem[] = [];
     let currentPage = 1;
     let startRow = 1;
+    let consecutiveDuplicatePages = 0;
     
     while (currentPage <= MAX_PAGES) {
       const paginatedUrl = buildPaginatedUrl(url, startRow);
@@ -191,7 +193,29 @@ serve(async (req) => {
         break;
       }
       
-      allItems.push(...items);
+      // Deduplicate items based on link (most unique identifier)
+      let newItemsCount = 0;
+      for (const item of items) {
+        const uniqueKey = item.link || `${item.title}-${item.author}`;
+        if (!seenLinks.has(uniqueKey)) {
+          seenLinks.add(uniqueKey);
+          allItems.push(item);
+          newItemsCount++;
+        }
+      }
+      
+      console.log(`Page ${currentPage}: ${newItemsCount} new unique items (${items.length - newItemsCount} duplicates)`);
+      
+      // If we got zero new items, the feed doesn't support proper pagination
+      if (newItemsCount === 0) {
+        consecutiveDuplicatePages++;
+        if (consecutiveDuplicatePages >= 2) {
+          console.log('Feed does not support pagination - stopping after duplicate pages');
+          break;
+        }
+      } else {
+        consecutiveDuplicatePages = 0;
+      }
       
       if (items.length < PAGE_SIZE) {
         // Last page (fewer results than page size)
