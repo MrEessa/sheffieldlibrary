@@ -117,38 +117,36 @@ function extractTotalResults(html: string): number {
 function parseHtmlResults(html: string): CDItem[] {
   const items: CDItem[] = [];
   
-  // Each result is in a cell_wrapper div. We'll extract per-item data.
-  // Split by cell_wrapper boundaries
-  const cellRegex = /class="cell_wrapper[^"]*"[\s\S]*?(?=class="cell_wrapper|<\/div>\s*<\/div>\s*<\/div>\s*<div class="resultsToolbar_wrapper|$)/g;
-  const cells = html.match(cellRegex) || [];
+  // Split HTML into per-item blocks using results_bio boundaries
+  const blocks = html.split(/id="results_bio\d+"/);
   
-  for (const cell of cells) {
-    // Title from displayDetailLink
-    const titleMatch = cell.match(/class="displayDetailLink">\s*<a[^>]*>([^<]+)<\/a>/);
+  // Skip first block (everything before first result)
+  for (let i = 1; i < blocks.length; i++) {
+    const block = blocks[i];
+    
+    // Title from hideIE class anchor inside displayDetailLink
+    const titleMatch = block.match(/class="hideIE"[^>]*>([^<]+)/);
     const title = titleMatch ? decodeHtmlEntities(titleMatch[1].trim()) : '';
     
     if (!title) continue;
     
-    // Author from INITIAL_AUTHOR_SRCH displayElementText
-    const authorMatch = cell.match(/INITIAL_AUTHOR_SRCH">\s*([^<]+)<\/div>/);
+    // Author from highlightMe INITIAL_AUTHOR_SRCH
+    const authorMatch = block.match(/highlightMe INITIAL_AUTHOR_SRCH">\s*([^<]+)/);
     let author = authorMatch ? decodeHtmlEntities(authorMatch[1].trim()) : '';
-    // Clean author suffixes
     author = author.replace(/,?\s*(director|author|editor|narrator|producer|writer)\.?$/i, '').trim();
     
-    // Year from PUBDATE displayElementText
-    const yearMatch = cell.match(/PUBDATE">\s*(\d{4})/);
+    // Year from highlightMe PUBDATE
+    const yearMatch = block.match(/highlightMe PUBDATE">\s*(\d{4})/);
     const year = yearMatch ? yearMatch[1] : '';
     
-    // Link - extract SD_ILS ID from checkbox value
-    const idMatch = cell.match(/SD_ILS[:/](\d+)/);
+    // Catalog ID from SD_ILS:NNNNNN pattern
+    const idMatch = block.match(/SD_ILS:(\d+)/);
     const catalogId = idMatch ? idMatch[1] : '';
     const link = catalogId 
       ? `https://library.sheffield.gov.uk/client/en_GB/default/search/detailnonmodal/ent:$002f$002fSD_ILS$002f0$002fSD_ILS:${catalogId}/one`
       : '';
     
-    // ISBN - check for hidden ISBN field
-    const isbnMatch = cell.match(/id="hitlist\d+_ISBN"[^>]*>([^<]*)</);
-    const isbn = isbnMatch ? isbnMatch[1].trim() : '';
+    const isbn = '';
     
     items.push({ title, author, year, isbn, link });
   }
