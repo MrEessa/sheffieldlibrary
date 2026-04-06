@@ -77,7 +77,7 @@ function parseAtomFeed(xml: string): CDItem[] {
 // ---- HTML SCRAPING (new, for full pagination) ----
 
 const HTML_PAGE_SIZE = 100;
-const DELAY_MS = 2000;
+const DELAY_MS = 1000;
 const MAX_HTML_PAGES = 100;
 
 function rssUrlToHtmlUrl(rssUrl: string): string {
