@@ -134,7 +134,14 @@ export function RSSInput({ onFetch, isLoading, progress }: RSSInputProps) {
         </Label>
       </div>
 
-      {urls.length > 0 && (
+      {isLoading && progress && (
+        <div className="space-y-2">
+          <Progress value={progress.totalFeeds > 0 ? (progress.currentFeed / progress.totalFeeds) * 100 : undefined} />
+          <p className="text-sm text-muted-foreground animate-pulse">{progress.status}</p>
+        </div>
+      )}
+
+      {urls.length > 0 && !isLoading && (
         <p className="text-xs text-muted-foreground">
           {urls.length} feed{urls.length !== 1 ? 's' : ''} queued. Results will be combined and deduplicated.
         </p>
