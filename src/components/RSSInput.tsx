@@ -4,14 +4,22 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Loader2, Plus, X } from 'lucide-react';
+
+interface ProgressInfo {
+  currentFeed: number;
+  totalFeeds: number;
+  status: string;
+}
 
 interface RSSInputProps {
   onFetch: (urls: string[], fetchAll: boolean) => void;
   isLoading: boolean;
+  progress?: ProgressInfo | null;
 }
 
-export function RSSInput({ onFetch, isLoading }: RSSInputProps) {
+export function RSSInput({ onFetch, isLoading, progress }: RSSInputProps) {
   const [currentUrl, setCurrentUrl] = useState('');
   const [urls, setUrls] = useState<string[]>([]);
   const [fetchAll, setFetchAll] = useState(true);
@@ -126,7 +134,14 @@ export function RSSInput({ onFetch, isLoading }: RSSInputProps) {
         </Label>
       </div>
 
-      {urls.length > 0 && (
+      {isLoading && progress && (
+        <div className="space-y-2">
+          <Progress value={progress.totalFeeds > 0 ? (progress.currentFeed / progress.totalFeeds) * 100 : undefined} />
+          <p className="text-sm text-muted-foreground animate-pulse">{progress.status}</p>
+        </div>
+      )}
+
+      {urls.length > 0 && !isLoading && (
         <p className="text-xs text-muted-foreground">
           {urls.length} feed{urls.length !== 1 ? 's' : ''} queued. Results will be combined and deduplicated.
         </p>

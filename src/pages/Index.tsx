@@ -5,7 +5,7 @@ import { useRSSFeed } from '@/hooks/useRSSFeed';
 import { Disc3 } from 'lucide-react';
 
 const Index = () => {
-  const { items, isLoading, stats, fetchFeed } = useRSSFeed();
+  const { items, isLoading, stats, progress, fetchFeed } = useRSSFeed();
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
@@ -28,7 +28,7 @@ const Index = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <RSSInput onFetch={fetchFeed} isLoading={isLoading} />
+            <RSSInput onFetch={fetchFeed} isLoading={isLoading} progress={progress} />
           </CardContent>
         </Card>
 
