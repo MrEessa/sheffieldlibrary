@@ -19,7 +19,7 @@ interface RSSInputProps {
   progress?: ProgressInfo | null;
 }
 
-export function RSSInput({ onFetch, isLoading }: RSSInputProps) {
+export function RSSInput({ onFetch, isLoading, progress }: RSSInputProps) {
   const [currentUrl, setCurrentUrl] = useState('');
   const [urls, setUrls] = useState<string[]>([]);
   const [fetchAll, setFetchAll] = useState(true);
