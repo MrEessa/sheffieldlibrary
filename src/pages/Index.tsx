@@ -28,7 +28,7 @@ const Index = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <RSSInput onFetch={fetchFeed} isLoading={isLoading} />
+            <RSSInput onFetch={fetchFeed} isLoading={isLoading} progress={progress} />
           </CardContent>
         </Card>
 
