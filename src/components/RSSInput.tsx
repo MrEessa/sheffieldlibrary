@@ -4,11 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Loader2, Plus, X } from 'lucide-react';
+
+interface ProgressInfo {
+  currentFeed: number;
+  totalFeeds: number;
+  status: string;
+}
 
 interface RSSInputProps {
   onFetch: (urls: string[], fetchAll: boolean) => void;
   isLoading: boolean;
+  progress?: ProgressInfo | null;
 }
 
 export function RSSInput({ onFetch, isLoading }: RSSInputProps) {
