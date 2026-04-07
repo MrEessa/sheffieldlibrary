@@ -202,14 +202,14 @@ export function CDTable({ items, mediaType }: CDTableProps) {
                       <img
                         src={coverUrl}
                         alt={`Cover: ${item.title}`}
-                        className={`rounded object-cover ${isDvd ? 'w-12 h-[4.5rem]' : 'w-12 h-12'}`}
+                        className={`rounded object-cover ${isDvd ? 'w-24 h-36' : 'w-24 h-24'}`}
                         loading="lazy"
                       />
                     ) : isLoadingCovers && !hasFetched ? (
-                      <Skeleton className={`${isDvd ? 'w-12 h-[4.5rem]' : 'w-12 h-12'} rounded`} />
+                      <Skeleton className={`${isDvd ? 'w-24 h-36' : 'w-24 h-24'} rounded`} />
                     ) : (
-                      <div className={`${isDvd ? 'w-12 h-[4.5rem]' : 'w-12 h-12'} rounded bg-muted flex items-center justify-center`}>
-                        <FallbackIcon className="h-5 w-5 text-muted-foreground" />
+                      <div className={`${isDvd ? 'w-24 h-36' : 'w-24 h-24'} rounded bg-muted flex items-center justify-center`}>
+                        <FallbackIcon className="h-8 w-8 text-muted-foreground" />
                       </div>
                     )}
                   </TableCell>
