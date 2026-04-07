@@ -246,6 +246,19 @@ async function scrapeAllHtmlPages(rssUrl: string): Promise<{ items: CDItem[]; to
   return { items: allItems, total: totalResults, pages: totalPages };
 }
 
+// ---- MEDIA TYPE DETECTION ----
+
+function detectMediaType(url: string): string {
+  const urlLower = url.toLowerCase();
+  if (urlLower.includes('lm=dvd') || urlLower.includes('lm=bluray') || urlLower.includes('lm=blu-ray')) {
+    return 'dvd';
+  }
+  if (urlLower.includes('lm=musiccd') || urlLower.includes('lm=cd') || urlLower.includes('lm=music')) {
+    return 'cd';
+  }
+  return 'unknown';
+}
+
 // ---- MAIN SERVER ----
 
 serve(async (req) => {
@@ -263,7 +276,8 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Request: url=${url}, fetchAll=${fetchAll}`);
+    const mediaType = detectMediaType(url);
+    console.log(`Request: url=${url}, fetchAll=${fetchAll}, mediaType=${mediaType}`);
 
     // Determine if this is a library RSS URL that we can scrape via HTML
     const isLibraryRss = url.includes('/rss/hitlist') || url.includes('library.sheffield.gov.uk');
@@ -274,7 +288,7 @@ serve(async (req) => {
       const { items, total, pages } = await scrapeAllHtmlPages(url);
       
       return new Response(
-        JSON.stringify({ items, total: items.length, expectedTotal: total, pages }),
+        JSON.stringify({ items, total: items.length, expectedTotal: total, pages, mediaType }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -299,7 +313,7 @@ serve(async (req) => {
     console.log(`RSS: parsed ${items.length} items`);
 
     return new Response(
-      JSON.stringify({ items, total: items.length, pages: 1 }),
+      JSON.stringify({ items, total: items.length, pages: 1, mediaType }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {

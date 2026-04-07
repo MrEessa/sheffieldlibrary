@@ -4,6 +4,8 @@ export interface CDItem {
   year: string;
   isbn: string;
   link: string;
+  coverUrl?: string;
+  mediaType?: 'dvd' | 'cd' | 'unknown';
 }
 
 export type SortField = 'title' | 'author' | 'year' | 'isbn';

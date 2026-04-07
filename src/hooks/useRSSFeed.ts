@@ -20,6 +20,7 @@ export function useRSSFeed() {
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<FeedStats | null>(null);
   const [progress, setProgress] = useState<ProgressInfo | null>(null);
+  const [mediaType, setMediaType] = useState<string>('unknown');
 
   const fetchFeed = async (urls: string[], fetchAll: boolean = false) => {
     if (urls.length === 0) {
@@ -35,6 +36,7 @@ export function useRSSFeed() {
       const allItems: CDItem[] = [];
       const seenLinks = new Set<string>();
       let totalRawItems = 0;
+      let detectedMediaType = 'unknown';
 
       for (let i = 0; i < urls.length; i++) {
         const url = urls[i];
@@ -61,6 +63,11 @@ export function useRSSFeed() {
           continue;
         }
 
+        // Capture media type from the response
+        if (data.mediaType && data.mediaType !== 'unknown') {
+          detectedMediaType = data.mediaType;
+        }
+
         totalRawItems += data.items.length;
 
         for (const item of data.items) {
@@ -71,7 +78,6 @@ export function useRSSFeed() {
           }
         }
 
-        // Show interim result count
         if (data.expectedTotal) {
           setProgress({
             currentFeed: i + 1,
@@ -83,6 +89,7 @@ export function useRSSFeed() {
 
       const duplicatesRemoved = totalRawItems - allItems.length;
       setItems(allItems);
+      setMediaType(detectedMediaType);
       setStats({ totalFeeds: urls.length, duplicatesRemoved });
       setProgress(null);
 
@@ -100,5 +107,5 @@ export function useRSSFeed() {
     }
   };
 
-  return { items, isLoading, error, stats, progress, fetchFeed };
+  return { items, isLoading, error, stats, progress, mediaType, fetchFeed };
 }
