@@ -16,27 +16,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { CDItem, SortField, SortDirection } from '@/types/cd-item';
 import { exportToCSV } from '@/utils/csv-export';
-import { ArrowUpDown, ArrowUp, ArrowDown, Download, Search, ExternalLink } from 'lucide-react';
+import { useCoverArt } from '@/hooks/useCoverArt';
+import { ArrowUpDown, ArrowUp, ArrowDown, Download, Search, ExternalLink, Film, Disc } from 'lucide-react';
 
 interface CDTableProps {
   items: CDItem[];
+  mediaType?: string;
 }
 
 const PAGE_SIZES = [25, 50, 100, 'all'] as const;
 
-export function CDTable({ items }: CDTableProps) {
+export function CDTable({ items, mediaType }: CDTableProps) {
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState<SortField>('title');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [pageSize, setPageSize] = useState<number | 'all'>(25);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Filter items based on search
   const filteredItems = useMemo(() => {
     if (!search.trim()) return items;
-    
     const searchLower = search.toLowerCase();
     return items.filter(
       (item) =>
@@ -47,12 +48,10 @@ export function CDTable({ items }: CDTableProps) {
     );
   }, [items, search]);
 
-  // Sort filtered items
   const sortedItems = useMemo(() => {
     return [...filteredItems].sort((a, b) => {
       const aValue = a[sortField].toLowerCase();
       const bValue = b[sortField].toLowerCase();
-      
       if (sortDirection === 'asc') {
         return aValue.localeCompare(bValue);
       }
@@ -60,15 +59,16 @@ export function CDTable({ items }: CDTableProps) {
     });
   }, [filteredItems, sortField, sortDirection]);
 
-  // Paginate sorted items
   const paginatedItems = useMemo(() => {
     if (pageSize === 'all') return sortedItems;
-    
     const start = (currentPage - 1) * pageSize;
     return sortedItems.slice(start, start + pageSize);
   }, [sortedItems, pageSize, currentPage]);
 
   const totalPages = pageSize === 'all' ? 1 : Math.ceil(sortedItems.length / pageSize);
+
+  // Fetch cover art for visible items
+  const { coverMap, isLoadingCovers } = useCoverArt(paginatedItems, mediaType);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -97,10 +97,12 @@ export function CDTable({ items }: CDTableProps) {
     setCurrentPage(1);
   };
 
-  // Reset to page 1 when search changes
   useMemo(() => {
     setCurrentPage(1);
   }, [search]);
+
+  const isDvd = mediaType === 'dvd';
+  const FallbackIcon = isDvd ? Film : Disc;
 
   if (items.length === 0) {
     return (
@@ -164,72 +166,72 @@ export function CDTable({ items }: CDTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-14">Cover</TableHead>
               <TableHead>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleSort('title')}
-                  className="-ml-4 font-semibold"
-                >
-                  Title
-                  {getSortIcon('title')}
+                <Button variant="ghost" onClick={() => handleSort('title')} className="-ml-4 font-semibold">
+                  Title{getSortIcon('title')}
                 </Button>
               </TableHead>
               <TableHead>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleSort('author')}
-                  className="-ml-4 font-semibold"
-                >
-                  Author/Artist
-                  {getSortIcon('author')}
+                <Button variant="ghost" onClick={() => handleSort('author')} className="-ml-4 font-semibold">
+                  Author/Artist{getSortIcon('author')}
                 </Button>
               </TableHead>
               <TableHead className="w-24">
-                <Button
-                  variant="ghost"
-                  onClick={() => handleSort('year')}
-                  className="-ml-4 font-semibold"
-                >
-                  Year
-                  {getSortIcon('year')}
+                <Button variant="ghost" onClick={() => handleSort('year')} className="-ml-4 font-semibold">
+                  Year{getSortIcon('year')}
                 </Button>
               </TableHead>
               <TableHead className="w-36">
-                <Button
-                  variant="ghost"
-                  onClick={() => handleSort('isbn')}
-                  className="-ml-4 font-semibold"
-                >
-                  ISBN
-                  {getSortIcon('isbn')}
+                <Button variant="ghost" onClick={() => handleSort('isbn')} className="-ml-4 font-semibold">
+                  ISBN{getSortIcon('isbn')}
                 </Button>
               </TableHead>
               <TableHead className="w-20 text-center">Link</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedItems.map((item, index) => (
-              <TableRow key={`${item.isbn || item.title}-${index}`}>
-                <TableCell className="font-medium">{item.title}</TableCell>
-                <TableCell>{item.author || '—'}</TableCell>
-                <TableCell>{item.year || '—'}</TableCell>
-                <TableCell className="font-mono text-sm">{item.isbn || '—'}</TableCell>
-                <TableCell className="text-center">
-                  {item.link ? (
-                    <a
-                      href={item.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center p-2 text-primary hover:text-primary/80 transition-colors"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  ) : (
-                    '—'
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+            {paginatedItems.map((item, index) => {
+              const coverUrl = coverMap.get(item.title);
+              const hasFetched = coverMap.has(item.title) || !isLoadingCovers;
+
+              return (
+                <TableRow key={`${item.isbn || item.title}-${index}`}>
+                  <TableCell className="p-2">
+                    {coverUrl ? (
+                      <img
+                        src={coverUrl}
+                        alt={`Cover: ${item.title}`}
+                        className={`rounded object-cover ${isDvd ? 'w-12 h-[4.5rem]' : 'w-12 h-12'}`}
+                        loading="lazy"
+                      />
+                    ) : isLoadingCovers && !hasFetched ? (
+                      <Skeleton className={`${isDvd ? 'w-12 h-[4.5rem]' : 'w-12 h-12'} rounded`} />
+                    ) : (
+                      <div className={`${isDvd ? 'w-12 h-[4.5rem]' : 'w-12 h-12'} rounded bg-muted flex items-center justify-center`}>
+                        <FallbackIcon className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell className="font-medium">{item.title}</TableCell>
+                  <TableCell>{item.author || '—'}</TableCell>
+                  <TableCell>{item.year || '—'}</TableCell>
+                  <TableCell className="font-mono text-sm">{item.isbn || '—'}</TableCell>
+                  <TableCell className="text-center">
+                    {item.link ? (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center p-2 text-primary hover:text-primary/80 transition-colors"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    ) : '—'}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
@@ -244,11 +246,9 @@ export function CDTable({ items }: CDTableProps) {
           >
             Previous
           </Button>
-          
           <span className="text-sm text-muted-foreground">
             Page {currentPage} of {totalPages}
           </span>
-          
           <Button
             variant="outline"
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
