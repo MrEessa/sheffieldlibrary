@@ -166,7 +166,7 @@ export function CDTable({ items, mediaType }: CDTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-14">Cover</TableHead>
+              <TableHead className="w-28">Cover</TableHead>
               <TableHead>
                 <Button variant="ghost" onClick={() => handleSort('title')} className="-ml-4 font-semibold">
                   Title{getSortIcon('title')}
