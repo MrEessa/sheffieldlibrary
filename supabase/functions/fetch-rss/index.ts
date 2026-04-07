@@ -288,7 +288,7 @@ serve(async (req) => {
       const { items, total, pages } = await scrapeAllHtmlPages(url);
       
       return new Response(
-        JSON.stringify({ items, total: items.length, expectedTotal: total, pages }),
+        JSON.stringify({ items, total: items.length, expectedTotal: total, pages, mediaType }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
