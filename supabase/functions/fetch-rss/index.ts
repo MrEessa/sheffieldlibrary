@@ -313,7 +313,7 @@ serve(async (req) => {
     console.log(`RSS: parsed ${items.length} items`);
 
     return new Response(
-      JSON.stringify({ items, total: items.length, pages: 1 }),
+      JSON.stringify({ items, total: items.length, pages: 1, mediaType }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
