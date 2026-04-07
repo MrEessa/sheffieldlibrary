@@ -276,7 +276,8 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Request: url=${url}, fetchAll=${fetchAll}`);
+    const mediaType = detectMediaType(url);
+    console.log(`Request: url=${url}, fetchAll=${fetchAll}, mediaType=${mediaType}`);
 
     // Determine if this is a library RSS URL that we can scrape via HTML
     const isLibraryRss = url.includes('/rss/hitlist') || url.includes('library.sheffield.gov.uk');
