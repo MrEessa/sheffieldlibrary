@@ -246,6 +246,19 @@ async function scrapeAllHtmlPages(rssUrl: string): Promise<{ items: CDItem[]; to
   return { items: allItems, total: totalResults, pages: totalPages };
 }
 
+// ---- MEDIA TYPE DETECTION ----
+
+function detectMediaType(url: string): string {
+  const urlLower = url.toLowerCase();
+  if (urlLower.includes('lm=dvd') || urlLower.includes('lm=bluray') || urlLower.includes('lm=blu-ray')) {
+    return 'dvd';
+  }
+  if (urlLower.includes('lm=musiccd') || urlLower.includes('lm=cd') || urlLower.includes('lm=music')) {
+    return 'cd';
+  }
+  return 'unknown';
+}
+
 // ---- MAIN SERVER ----
 
 serve(async (req) => {
