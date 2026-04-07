@@ -1,43 +1,49 @@
 
 
-# Scrape HTML Search Results Instead of RSS
+# Add Cover Art Column
 
-## Why the Current Approach Cannot Work
-The RSS feed endpoint (`/client/rss/hitlist/...`) ignores all pagination parameters (`rw`, `ps`, sort). It always returns the same 300 items. No amount of delays or retries will change this -- the server simply does not support RSS pagination.
+## Overview
+Add a cover art thumbnail column to the catalog table. DVDs use TMDB, CDs use MusicBrainz/Cover Art Archive. Covers load lazily per visible page to avoid rate limits.
 
-## The Solution
-The **HTML search results page** (`/client/en_GB/default/search/results?...`) fully supports the `rw` (start row) parameter. I confirmed this by fetching page 1 (`rw=1`) and page 2 (`rw=21`) -- they return different items. It also supports `ps=100` (100 items per page).
+## Steps
 
-This means we can paginate through the entire catalog: ~3,471 DVDs across ~35 pages of 100 items each.
+### 1. Store TMDB API key as a backend secret
+Use the `add_secret` tool to request your TMDB API key (stored securely, accessed only by the backend function).
 
-## What Changes
+### 2. Update data model (`src/types/cd-item.ts`)
+- Add `coverUrl?: string` to `CDItem`
+- Add `mediaType?: 'dvd' | 'cd' | 'unknown'`
 
-### 1. Update the Edge Function (`fetch-rss/index.ts`)
-- Add a new HTML scraping mode alongside the existing RSS parser
-- Convert RSS feed URLs to HTML search URLs automatically (swap `/rss/hitlist/` for `/search/results`)
-- Parse items from HTML using the structured CSS classes already present: `displayDetailLink` (title), `INITIAL_AUTHOR_SRCH` (author), `PUBDATE` (year), `SD_ILS` IDs (link)
-- Extract total result count from the "X Results Found" text on page 1
-- Paginate with `ps=100`, incrementing `rw` by 100 each page
-- Add a configurable delay between requests (default 2 seconds) to be respectful to the library server
-- Keep the existing RSS mode as a fallback
+### 3. Create new Edge Function `fetch-cover-art`
+- Accepts `{ titles: { title: string, author: string }[], mediaType: string }`
+- **DVDs**: Search TMDB `/search/movie?query={title}` using the stored API key, return `w92` poster URL
+- **CDs**: Search MusicBrainz release API by title+artist, then fetch Cover Art Archive URL (no key needed)
+- Returns `{ covers: Record<string, string> }` mapping title to image URL
+- Rate limiting: TMDB allows 40 req/s; MusicBrainz requires 1 req/s with custom User-Agent
 
-### 2. Update the Frontend Hook (`useRSSFeed.ts`)
-- Pass progress updates back to the UI (e.g., "Loading page 3 of 35...")
-- Show a progress indicator with estimated items loaded vs total
+### 4. Auto-detect media type in `fetch-rss/index.ts`
+- Parse the URL for `lm=DVD`, `lm=MUSICCD`, etc.
+- Return `mediaType` field in the response alongside items
 
-### 3. Update the UI (`RSSInput.tsx`)
-- Show a progress bar during multi-page loads
-- Display "Loaded 500 of 3,471 items..." style feedback
+### 5. Add cover-fetching hook (`src/hooks/useCoverArt.ts`)
+- Takes the current page of items + mediaType
+- Calls `fetch-cover-art` edge function with batched titles
+- Caches results in a `Map<string, string>` so revisiting pages doesn't re-fetch
+- Returns `coverMap: Map<string, string>` and `isLoadingCovers: boolean`
 
-### 4. Keep Existing Features
-- Multi-URL support and deduplication remain unchanged
-- CSV export, search, filter, sort all continue to work
-- The user still pastes the same RSS URL -- the backend auto-converts it
+### 6. Update table UI (`CDTable.tsx`)
+- Add narrow "Cover" column (48px) to the left of Title
+- Show skeleton placeholder while loading
+- Display thumbnail (DVD: 48x71 poster ratio; CD: 48x48 square)
+- Fallback icon (Film or Disc) when no cover found
+- Trigger cover fetch whenever the visible page changes
 
-## Technical Details
-- Page size: `ps=100` (confirmed working)
-- Delay between pages: 2 seconds (respectful, ~70 seconds for full DVD catalog)
-- Total count parsed from HTML: `"3471 Results Found"` text
-- Item data extracted from HTML classes: `displayDetailLink` for title/link, `INITIAL_AUTHOR_SRCH` for author, `PUBDATE` for year, `PUBLISHER` for publisher
-- Edge function timeout: Supabase allows up to 150 seconds per invocation, so we may need to chunk into batches if the catalog is very large
+### 7. Update `useRSSFeed.ts`
+- Pass `mediaType` through from edge function response to the UI
+
+## Technical Notes
+- TMDB poster URL format: `https://image.tmdb.org/t/p/w92/{poster_path}`
+- MusicBrainz requires `User-Agent: LibraryCDBrowser/1.0 (contact@email.com)`
+- Covers fetched only for visible page (25-100 items), not all thousands
+- Cover cache persists in component state across page changes
 
