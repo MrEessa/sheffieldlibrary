@@ -1,6 +1,6 @@
 # Sheffield Library Browser
 
-A web app for browsing Sheffield Libraries' CD and DVD catalogue. Paste one or more RSS feed URLs from a Sheffield Libraries catalogue search and the app fetches, deduplicates, and displays all matching items in a searchable, sortable table — complete with cover art from TMDB (DVDs) and MusicBrainz / Cover Art Archive (CDs).
+A web app for browsing Sheffield Libraries' CD and DVD catalogue. Paste one or more RSS feed URLs from a Sheffield Libraries catalogue search and the app fetches, deduplicates, and displays all matching items in a searchable, sortable table - complete with cover art from TMDB (DVDs) and MusicBrainz / Cover Art Archive (CDs).
 
 ## Features
 
