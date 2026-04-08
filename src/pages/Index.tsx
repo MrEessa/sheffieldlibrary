@@ -14,8 +14,8 @@ const Index = () => {
         <div className="flex items-center gap-3">
           <Disc3 className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Library CD Browser</h1>
-            <p className="text-muted-foreground">Search and browse audio CDs from your library's RSS feeds</p>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Sheffield Library Browser</h1>
+            <p className="text-muted-foreground">Search and browse CDs and DVDs from Sheffield Libraries</p>
           </div>
         </div>
 

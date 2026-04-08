@@ -1,8 +1,8 @@
 export interface CDItem {
   title: string;
-  author: string;
-  year: string;
-  isbn: string;
+  author?: string;
+  year?: string;
+  isbn?: string;
   link: string;
   coverUrl?: string;
   mediaType?: 'dvd' | 'cd' | 'unknown';

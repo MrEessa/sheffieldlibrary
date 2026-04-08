@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -42,16 +42,16 @@ export function CDTable({ items, mediaType }: CDTableProps) {
     return items.filter(
       (item) =>
         item.title.toLowerCase().includes(searchLower) ||
-        item.author.toLowerCase().includes(searchLower) ||
-        item.year.includes(searchLower) ||
-        item.isbn.includes(searchLower)
+        (item.author ?? '').toLowerCase().includes(searchLower) ||
+        (item.year ?? '').includes(searchLower) ||
+        (item.isbn ?? '').includes(searchLower)
     );
   }, [items, search]);
 
   const sortedItems = useMemo(() => {
     return [...filteredItems].sort((a, b) => {
-      const aValue = a[sortField].toLowerCase();
-      const bValue = b[sortField].toLowerCase();
+      const aValue = (a[sortField] ?? '').toLowerCase();
+      const bValue = (b[sortField] ?? '').toLowerCase();
       if (sortDirection === 'asc') {
         return aValue.localeCompare(bValue);
       }
@@ -97,7 +97,7 @@ export function CDTable({ items, mediaType }: CDTableProps) {
     setCurrentPage(1);
   };
 
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [search]);
 

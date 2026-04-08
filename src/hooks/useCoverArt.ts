@@ -23,7 +23,6 @@ export function useCoverArt(visibleItems: CDItem[], mediaType?: string) {
       });
 
       if (error) {
-        console.error('Cover art fetch error:', error);
         // Mark as fetched so we don't retry
         newItems.forEach(item => fetchedTitlesRef.current.add(item.title));
         return;
@@ -40,7 +39,6 @@ export function useCoverArt(visibleItems: CDItem[], mediaType?: string) {
         setCoverMap(new Map(cacheRef.current));
       }
     } catch (err) {
-      console.error('Cover art error:', err);
       newItems.forEach(item => fetchedTitlesRef.current.add(item.title));
     } finally {
       setIsLoadingCovers(false);

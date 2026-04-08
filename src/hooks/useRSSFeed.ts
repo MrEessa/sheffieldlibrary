@@ -54,12 +54,10 @@ export function useRSSFeed() {
         });
 
         if (fnError) {
-          console.error(`Error fetching feed ${i + 1}:`, fnError);
           continue;
         }
 
         if (data.error) {
-          console.error(`Feed ${i + 1} error:`, data.error);
           continue;
         }
 
