@@ -40,6 +40,15 @@ Paste the RSS URL into the input field and click **Load Feeds**. The "Load all r
 - Click the link icon on any row to open the item in the Sheffield Libraries catalogue
 - Click **Export CSV** to download the current filtered results
 
+
+## Screenshots Flow
+<img width="1019" height="559" alt="image" src="https://github.com/user-attachments/assets/d0a0a582-bb58-4a2d-871b-78cd8f00355b" />
+<img width="1042" height="782" alt="image" src="https://github.com/user-attachments/assets/2e6bbda0-8f5b-413d-86a2-36ab84577350" />
+<img width="1033" height="508" alt="image" src="https://github.com/user-attachments/assets/fc7ce726-3e9a-406a-8e73-f2655089982f" />
+<img width="1313" height="330" alt="image" src="https://github.com/user-attachments/assets/56e8240c-d87a-4938-93dd-dd2e6387b7e8" />
+<img width="1326" height="670" alt="image" src="https://github.com/user-attachments/assets/1f2574fa-90b0-4d3b-9f11-f014972ccd8a" />
+
+
 ## License & Attribution
 
 This project is for **personal, non-commercial use only**. Cover art is sourced from [The Movie Database (TMDB)](https://www.themoviedb.org) using a personal API key under TMDB's non-commercial terms — this application is not endorsed by or affiliated with TMDB. Cover art for CDs is sourced from [MusicBrainz](https://musicbrainz.org) and [Cover Art Archive](https://coverartarchive.org). This tool is intended purely as a browsing aid for the Sheffield Libraries catalogue and **must not be used for any commercial purpose**.
