@@ -26,7 +26,7 @@ A web app for browsing Sheffield Libraries' CD and DVD catalogue. Paste one or m
    https://library.sheffield.gov.uk/client/rss/hitlist/default/te=ILS&lm=DVD
    ```
 
-You can add multiple RSS URLs (e.g. one for DVDs and one for CDs) — results are combined and deduplicated automatically.
+You can add multiple RSS URLs (e.g. one for DVDs and one for CDs) - results are combined and deduplicated automatically.
 
 ### 2. Load the catalogue
 
