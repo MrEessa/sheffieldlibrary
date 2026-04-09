@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Table,
   TableBody,
@@ -35,6 +35,18 @@ export function CDTable({ items, mediaType }: CDTableProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [pageSize, setPageSize] = useState<number | 'all'>(25);
   const [currentPage, setCurrentPage] = useState(1);
+  const tableTopRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  const scrollToTop = () => tableTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    scrollToTop();
+  }, [currentPage]);
 
   const filteredItems = useMemo(() => {
     if (!search.trim()) return items;
@@ -113,7 +125,7 @@ export function CDTable({ items, mediaType }: CDTableProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div ref={tableTopRef} className="space-y-4">
       {/* Controls Row */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="relative w-full sm:w-80">
