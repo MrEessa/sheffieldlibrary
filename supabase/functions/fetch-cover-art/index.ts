@@ -166,8 +166,9 @@ serve(async (req) => {
       for (let i = 0; i < titles.length; i++) {
         const { title, author, isbn } = titles[i];
         const coverUrl = await fetchOpenLibraryCover(title, author, isbn);
+        const key = isbn || title;
         if (coverUrl) {
-          covers[title] = coverUrl;
+          covers[key] = coverUrl;
         }
         if (i < titles.length - 1) {
           await delay(500);
