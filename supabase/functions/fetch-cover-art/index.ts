@@ -84,8 +84,20 @@ async function fetchMusicBrainzCover(title: string, artist: string): Promise<str
   }
 }
 
-async function fetchOpenLibraryCover(title: string, author: string): Promise<string | null> {
+async function fetchOpenLibraryCover(title: string, author: string, isbn?: string): Promise<string | null> {
   try {
+    // If ISBN available, try direct cover URL first (no API call needed)
+    if (isbn) {
+      const cleanIsbn = isbn.replace(/[-\s]/g, '');
+      const directUrl = `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-M.jpg`;
+      // Check if the cover actually exists (non-1x1 pixel response)
+      const checkResponse = await fetch(directUrl, { method: 'HEAD' });
+      if (checkResponse.ok && checkResponse.headers.get('content-length') !== '43') {
+        return directUrl;
+      }
+    }
+
+    // Fallback: search by title+author
     const params = new URLSearchParams({ limit: '1', fields: 'cover_i' });
     if (title) params.set('title', title);
     if (author) params.set('author', author);
