@@ -1,13 +1,13 @@
 # Sheffield Library Browser
 
-A web app for browsing Sheffield Libraries' books, CD and DVD catalogue. Paste one or more RSS feed URLs from a Sheffield Libraries catalogue search and the app fetches, deduplicates, and displays all matching items in a searchable, sortable table - complete with cover art from TMDB (DVDs) and MusicBrainz / Cover Art Archive (CDs).
+A web app for browsing Sheffield Libraries' books, CD and DVD catalogue. Paste one or more RSS feed URLs from a Sheffield Libraries catalogue search and the app fetches, deduplicates, and displays all matching items in a searchable, sortable table - complete with cover art from TMDB (DVDs), MusicBrainz / Cover Art Archive (CDs), and Open Library (books).
 
 ## Features
 
 - Paste one or more RSS feed URLs from Sheffield Libraries catalogue searches
 - Fetches all pages of results automatically (not just the first 10)
 - Deduplicates results across multiple feeds
-- Cover art for DVDs via [The Movie Database (TMDB)](https://www.themoviedb.org), for CDs via [MusicBrainz](https://musicbrainz.org) / [Cover Art Archive](https://coverartarchive.org)
+- Cover art for DVDs via [The Movie Database (TMDB)](https://www.themoviedb.org), for CDs via [MusicBrainz](https://musicbrainz.org) / [Cover Art Archive](https://coverartarchive.org), and for books via [Open Library](https://openlibrary.org) (ISBN-first lookup with title/author fallback)
 - Sortable columns: title, author/artist, year, ISBN
 - Full-text search across title, author, year, and ISBN
 - Configurable page size (25 / 50 / 100 / all)
@@ -53,12 +53,12 @@ Paste the RSS URL into the input field and click **Load Feeds**. The "Load all r
 
 ## License & Attribution
 
-This project is for **personal, non-commercial use only**. Cover art is sourced from [The Movie Database (TMDB)](https://www.themoviedb.org) using a personal API key under TMDB's non-commercial terms — this application is not endorsed by or affiliated with TMDB. Cover art for CDs is sourced from [MusicBrainz](https://musicbrainz.org) and [Cover Art Archive](https://coverartarchive.org). This tool is intended purely as a browsing aid for the Sheffield Libraries catalogue and **must not be used for any commercial purpose**.
+This project is for **personal, non-commercial use only**. Cover art is sourced from [The Movie Database (TMDB)](https://www.themoviedb.org) using a personal API key under TMDB's non-commercial terms — this application is not endorsed by or affiliated with TMDB. Cover art for CDs is sourced from [MusicBrainz](https://musicbrainz.org) and [Cover Art Archive](https://coverartarchive.org). Cover art for books is sourced from [Open Library](https://openlibrary.org) / [Open Library Covers](https://covers.openlibrary.org), an initiative of the Internet Archive. This tool is intended purely as a browsing aid for the Sheffield Libraries catalogue and **must not be used for any commercial purpose**.
 
 ## Tech Stack
 
 - **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, [shadcn/ui](https://ui.shadcn.com)
 - **Backend proxy:** [Supabase Edge Functions](https://supabase.com/docs/guides/functions) (Deno)
   - `fetch-rss` — fetches and parses the Sheffield Libraries RSS/HTML catalogue with full pagination
-  - `fetch-cover-art` — queries TMDB (DVDs) and MusicBrainz (CDs) for cover images
-- **Cover art sources:** [TMDB API](https://developer.themoviedb.org/docs), [MusicBrainz API](https://musicbrainz.org/doc/MusicBrainz_API), [Cover Art Archive](https://coverartarchive.org)
+  - `fetch-cover-art` — queries TMDB (DVDs), MusicBrainz (CDs), and Open Library (books) for cover images
+- **Cover art sources:** [TMDB API](https://developer.themoviedb.org/docs), [MusicBrainz API](https://musicbrainz.org/doc/MusicBrainz_API), [Cover Art Archive](https://coverartarchive.org), [Open Library Covers API](https://openlibrary.org/dev/docs/api#anchor_images)
