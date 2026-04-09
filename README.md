@@ -45,7 +45,6 @@ Paste the RSS URL into the input field and click **Load Feeds**. The "Load all r
 <img width="1019" height="559" alt="image" src="https://github.com/user-attachments/assets/d0a0a582-bb58-4a2d-871b-78cd8f00355b" />
 <img width="1042" height="782" alt="image" src="https://github.com/user-attachments/assets/2e6bbda0-8f5b-413d-86a2-36ab84577350" />
 <img width="1033" height="508" alt="image" src="https://github.com/user-attachments/assets/fc7ce726-3e9a-406a-8e73-f2655089982f" />
-<img width="1313" height="330" alt="image" src="https://github.com/user-attachments/assets/56e8240c-d87a-4938-93dd-dd2e6387b7e8" />
 <img width="1315" height="883" alt="image" src="https://github.com/user-attachments/assets/f465d4e4-5b6b-4856-8f95-44a672b2d5a8" />
 <img width="1011" height="923" alt="image" src="https://github.com/user-attachments/assets/048dff0a-c16b-4f62-a169-3ec06e571c00" />
 
