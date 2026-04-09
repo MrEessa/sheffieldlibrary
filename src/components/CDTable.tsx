@@ -212,12 +212,24 @@ export function CDTable({ items, mediaType }: CDTableProps) {
                 <TableRow key={`${item.isbn || item.title}-${index}`}>
                   <TableCell className="p-2">
                     {coverUrl ? (
-                      <img
-                        src={coverUrl}
-                        alt={`Cover: ${item.title}`}
-                        className={`rounded object-cover ${isDvd ? 'w-24 h-36' : 'w-24 h-24'}`}
-                        loading="lazy"
-                      />
+                      <HoverCard openDelay={200} closeDelay={100}>
+                        <HoverCardTrigger asChild>
+                          <img
+                            src={coverUrl}
+                            alt={`Cover: ${item.title}`}
+                            className={`rounded object-cover cursor-pointer ${isDvd ? 'w-24 h-36' : 'w-24 h-24'}`}
+                            loading="lazy"
+                          />
+                        </HoverCardTrigger>
+                        <HoverCardContent side="right" className="w-auto p-2">
+                          <img
+                            src={coverUrl.replace('/w92/', '/w300/')}
+                            alt={`Cover: ${item.title}`}
+                            className={`rounded object-cover ${isDvd ? 'w-[300px]' : 'w-[250px]'}`}
+                          />
+                          <p className="mt-2 text-sm font-medium max-w-[300px] truncate">{item.title}</p>
+                        </HoverCardContent>
+                      </HoverCard>
                     ) : isLoadingCovers && !hasFetched ? (
                       <Skeleton className={`${isDvd ? 'w-24 h-36' : 'w-24 h-24'} rounded`} />
                     ) : (
