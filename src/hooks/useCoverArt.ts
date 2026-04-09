@@ -2,15 +2,18 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { CDItem } from '@/types/cd-item';
 
+function coverKey(item: CDItem): string {
+  return item.isbn || item.title;
+}
+
 export function useCoverArt(visibleItems: CDItem[], mediaType?: string) {
   const [coverMap, setCoverMap] = useState<Map<string, string>>(new Map());
   const [isLoadingCovers, setIsLoadingCovers] = useState(false);
   const cacheRef = useRef<Map<string, string>>(new Map());
-  const fetchedTitlesRef = useRef<Set<string>>(new Set());
+  const fetchedKeysRef = useRef<Set<string>>(new Set());
 
   const fetchCovers = useCallback(async (items: CDItem[], type: string) => {
-    // Filter to only titles we haven't fetched yet
-    const newItems = items.filter(item => !fetchedTitlesRef.current.has(item.title));
+    const newItems = items.filter(item => !fetchedKeysRef.current.has(coverKey(item)));
     if (newItems.length === 0) return;
 
     setIsLoadingCovers(true);
@@ -23,23 +26,20 @@ export function useCoverArt(visibleItems: CDItem[], mediaType?: string) {
       });
 
       if (error) {
-        // Mark as fetched so we don't retry
-        newItems.forEach(item => fetchedTitlesRef.current.add(item.title));
+        newItems.forEach(item => fetchedKeysRef.current.add(coverKey(item)));
         return;
       }
 
       if (data?.covers) {
         const newCovers = data.covers as Record<string, string>;
-        for (const [title, url] of Object.entries(newCovers)) {
-          cacheRef.current.set(title, url);
+        for (const [key, url] of Object.entries(newCovers)) {
+          cacheRef.current.set(key, url);
         }
-        // Mark all as fetched (including those with no cover)
-        newItems.forEach(item => fetchedTitlesRef.current.add(item.title));
-
+        newItems.forEach(item => fetchedKeysRef.current.add(coverKey(item)));
         setCoverMap(new Map(cacheRef.current));
       }
     } catch (err) {
-      newItems.forEach(item => fetchedTitlesRef.current.add(item.title));
+      newItems.forEach(item => fetchedKeysRef.current.add(coverKey(item)));
     } finally {
       setIsLoadingCovers(false);
     }
@@ -50,5 +50,5 @@ export function useCoverArt(visibleItems: CDItem[], mediaType?: string) {
     fetchCovers(visibleItems, mediaType);
   }, [visibleItems, mediaType, fetchCovers]);
 
-  return { coverMap, isLoadingCovers };
+  return { coverMap, isLoadingCovers, coverKey };
 }
