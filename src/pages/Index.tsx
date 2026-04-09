@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { RSSInput } from '@/components/RSSInput';
-import { CDTable } from '@/components/CDTable';
-import { useRSSFeed } from '@/hooks/useRSSFeed';
-import { Disc3 } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { RSSInput } from "@/components/RSSInput";
+import { CDTable } from "@/components/CDTable";
+import { useRSSFeed } from "@/hooks/useRSSFeed";
+import { Disc3 } from "lucide-react";
 
 const Index = () => {
   const { items, isLoading, stats, progress, mediaType, fetchFeed } = useRSSFeed();
@@ -15,7 +15,7 @@ const Index = () => {
           <Disc3 className="h-8 w-8 text-primary" />
           <div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Sheffield Library Browser</h1>
-            <p className="text-muted-foreground">Search and browse CDs and DVDs from Sheffield Libraries</p>
+            <p className="text-muted-foreground">Search and browse books, CDs, and DVDs from Sheffield Libraries</p>
           </div>
         </div>
 
@@ -23,9 +23,7 @@ const Index = () => {
         <Card>
           <CardHeader className="pb-4">
             <CardTitle className="text-lg">Load RSS Feeds</CardTitle>
-            <CardDescription>
-              Add one or more RSS feed URLs. Results will be combined and deduplicated.
-            </CardDescription>
+            <CardDescription>Add one or more RSS feed URLs. Results will be combined and deduplicated.</CardDescription>
           </CardHeader>
           <CardContent>
             <RSSInput onFetch={fetchFeed} isLoading={isLoading} progress={progress} />
