@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 interface CoverRequest {
-  titles: { title: string; author: string }[];
+  titles: { title: string; author: string; isbn?: string }[];
   mediaType: string;
 }
 
