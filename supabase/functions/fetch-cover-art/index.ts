@@ -84,6 +84,32 @@ async function fetchMusicBrainzCover(title: string, artist: string): Promise<str
   }
 }
 
+async function fetchOpenLibraryCover(title: string, author: string): Promise<string | null> {
+  try {
+    const params = new URLSearchParams({ limit: '1', fields: 'cover_i' });
+    if (title) params.set('title', title);
+    if (author) params.set('author', author);
+
+    const searchUrl = `https://openlibrary.org/search.json?${params.toString()}`;
+    const response = await fetch(searchUrl, {
+      headers: { 'User-Agent': 'LibraryCDBrowser/1.0 (sheffield-library-browser@lovable.app)' },
+    });
+
+    if (!response.ok) {
+      await response.text();
+      return null;
+    }
+
+    const data = await response.json();
+    if (data.docs && data.docs.length > 0 && data.docs[0].cover_i) {
+      return `https://covers.openlibrary.org/b/id/${data.docs[0].cover_i}-M.jpg`;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -103,20 +129,17 @@ serve(async (req) => {
     const TMDB_API_KEY = Deno.env.get('TMDB_API_KEY');
 
     if (mediaType === 'dvd' && TMDB_API_KEY) {
-      // TMDB allows ~40 req/s, process in batches of 5 with small delays
       for (let i = 0; i < titles.length; i++) {
         const { title } = titles[i];
         const coverUrl = await fetchTMDBCover(title, TMDB_API_KEY);
         if (coverUrl) {
           covers[title] = coverUrl;
         }
-        // Small delay every 5 requests
         if ((i + 1) % 5 === 0 && i < titles.length - 1) {
           await delay(150);
         }
       }
     } else if (mediaType === 'cd') {
-      // MusicBrainz requires 1 req/s
       for (let i = 0; i < titles.length; i++) {
         const { title, author } = titles[i];
         const coverUrl = await fetchMusicBrainzCover(title, author);
@@ -125,6 +148,17 @@ serve(async (req) => {
         }
         if (i < titles.length - 1) {
           await delay(1100);
+        }
+      }
+    } else if (mediaType === 'book') {
+      for (let i = 0; i < titles.length; i++) {
+        const { title, author } = titles[i];
+        const coverUrl = await fetchOpenLibraryCover(title, author);
+        if (coverUrl) {
+          covers[title] = coverUrl;
+        }
+        if (i < titles.length - 1) {
+          await delay(500);
         }
       }
     }
