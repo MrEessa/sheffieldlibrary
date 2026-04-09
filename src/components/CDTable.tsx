@@ -207,8 +207,9 @@ export function CDTable({ items, mediaType }: CDTableProps) {
           </TableHeader>
           <TableBody>
             {paginatedItems.map((item, index) => {
-              const coverUrl = coverMap.get(item.title);
-              const hasFetched = coverMap.has(item.title) || !isLoadingCovers;
+              const key = coverKey(item);
+              const coverUrl = coverMap.get(key);
+              const hasFetched = coverMap.has(key) || !isLoadingCovers;
 
               return (
                 <TableRow key={`${item.isbn || item.title}-${index}`}>
