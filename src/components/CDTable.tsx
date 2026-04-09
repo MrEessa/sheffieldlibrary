@@ -20,7 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CDItem, SortField, SortDirection } from '@/types/cd-item';
 import { exportToCSV } from '@/utils/csv-export';
 import { useCoverArt } from '@/hooks/useCoverArt';
-import { ArrowUpDown, ArrowUp, ArrowDown, Download, Search, ExternalLink, Film, Disc } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Download, Search, ExternalLink, Film, Disc, BookOpen } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
 interface CDTableProps {
