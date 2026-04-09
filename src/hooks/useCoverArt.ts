@@ -16,7 +16,7 @@ export function useCoverArt(visibleItems: CDItem[], mediaType?: string) {
     setIsLoadingCovers(true);
 
     try {
-      const titles = newItems.map(item => ({ title: item.title, author: item.author }));
+      const titles = newItems.map(item => ({ title: item.title, author: item.author || '', isbn: item.isbn || '' }));
 
       const { data, error } = await supabase.functions.invoke('fetch-cover-art', {
         body: { titles, mediaType: type },
