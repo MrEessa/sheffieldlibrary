@@ -219,15 +219,15 @@ export function CDTable({ items, mediaType }: CDTableProps) {
                           <img
                             src={coverUrl}
                             alt={`Cover: ${item.title}`}
-                            className={`rounded object-cover cursor-pointer ${isDvd ? 'w-24 h-36' : 'w-24 h-24'}`}
+                            className={`rounded object-cover cursor-pointer ${isPortrait ? 'w-24 h-36' : 'w-24 h-24'}`}
                             loading="lazy"
                           />
                         </HoverCardTrigger>
                         <HoverCardContent side="right" className="w-auto p-2">
                           <img
-                            src={coverUrl.replace('/w92/', '/w300/')}
+                            src={isBook ? coverUrl.replace('-M.jpg', '-L.jpg') : coverUrl.replace('/w92/', '/w300/')}
                             alt={`Cover: ${item.title}`}
-                            className={`rounded object-cover ${isDvd ? 'w-[300px]' : 'w-[250px]'}`}
+                            className={`rounded object-cover ${isPortrait ? 'w-[300px]' : 'w-[250px]'}`}
                           />
                           <p className="mt-2 text-sm font-medium max-w-[300px] truncate">{item.title}</p>
                         </HoverCardContent>
