@@ -233,9 +233,9 @@ export function CDTable({ items, mediaType }: CDTableProps) {
                         </HoverCardContent>
                       </HoverCard>
                     ) : isLoadingCovers && !hasFetched ? (
-                      <Skeleton className={`${isDvd ? 'w-24 h-36' : 'w-24 h-24'} rounded`} />
+                      <Skeleton className={`${isPortrait ? 'w-24 h-36' : 'w-24 h-24'} rounded`} />
                     ) : (
-                      <div className={`${isDvd ? 'w-24 h-36' : 'w-24 h-24'} rounded bg-muted flex items-center justify-center`}>
+                      <div className={`${isPortrait ? 'w-24 h-36' : 'w-24 h-24'} rounded bg-muted flex items-center justify-center`}>
                         <FallbackIcon className="h-8 w-8 text-muted-foreground" />
                       </div>
                     )}
