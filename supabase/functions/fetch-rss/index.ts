@@ -256,6 +256,9 @@ function detectMediaType(url: string): string {
   if (urlLower.includes('lm=musiccd') || urlLower.includes('lm=cd') || urlLower.includes('lm=music')) {
     return 'cd';
   }
+  if (urlLower.includes('format%09book') || urlLower.includes('lm=book')) {
+    return 'book';
+  }
   return 'unknown';
 }
 

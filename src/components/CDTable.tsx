@@ -20,7 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CDItem, SortField, SortDirection } from '@/types/cd-item';
 import { exportToCSV } from '@/utils/csv-export';
 import { useCoverArt } from '@/hooks/useCoverArt';
-import { ArrowUpDown, ArrowUp, ArrowDown, Download, Search, ExternalLink, Film, Disc } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown, Download, Search, ExternalLink, Film, Disc, BookOpen } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
 interface CDTableProps {
@@ -115,7 +115,9 @@ export function CDTable({ items, mediaType }: CDTableProps) {
   }, [search]);
 
   const isDvd = mediaType === 'dvd';
-  const FallbackIcon = isDvd ? Film : Disc;
+  const isBook = mediaType === 'book';
+  const isPortrait = isDvd || isBook;
+  const FallbackIcon = isDvd ? Film : isBook ? BookOpen : Disc;
 
   if (items.length === 0) {
     return (
@@ -217,23 +219,23 @@ export function CDTable({ items, mediaType }: CDTableProps) {
                           <img
                             src={coverUrl}
                             alt={`Cover: ${item.title}`}
-                            className={`rounded object-cover cursor-pointer ${isDvd ? 'w-24 h-36' : 'w-24 h-24'}`}
+                            className={`rounded object-cover cursor-pointer ${isPortrait ? 'w-24 h-36' : 'w-24 h-24'}`}
                             loading="lazy"
                           />
                         </HoverCardTrigger>
                         <HoverCardContent side="right" className="w-auto p-2">
                           <img
-                            src={coverUrl.replace('/w92/', '/w300/')}
+                            src={isBook ? coverUrl.replace('-M.jpg', '-L.jpg') : coverUrl.replace('/w92/', '/w300/')}
                             alt={`Cover: ${item.title}`}
-                            className={`rounded object-cover ${isDvd ? 'w-[300px]' : 'w-[250px]'}`}
+                            className={`rounded object-cover ${isPortrait ? 'w-[300px]' : 'w-[250px]'}`}
                           />
                           <p className="mt-2 text-sm font-medium max-w-[300px] truncate">{item.title}</p>
                         </HoverCardContent>
                       </HoverCard>
                     ) : isLoadingCovers && !hasFetched ? (
-                      <Skeleton className={`${isDvd ? 'w-24 h-36' : 'w-24 h-24'} rounded`} />
+                      <Skeleton className={`${isPortrait ? 'w-24 h-36' : 'w-24 h-24'} rounded`} />
                     ) : (
-                      <div className={`${isDvd ? 'w-24 h-36' : 'w-24 h-24'} rounded bg-muted flex items-center justify-center`}>
+                      <div className={`${isPortrait ? 'w-24 h-36' : 'w-24 h-24'} rounded bg-muted flex items-center justify-center`}>
                         <FallbackIcon className="h-8 w-8 text-muted-foreground" />
                       </div>
                     )}

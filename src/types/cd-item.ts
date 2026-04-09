@@ -5,7 +5,7 @@ export interface CDItem {
   isbn?: string;
   link: string;
   coverUrl?: string;
-  mediaType?: 'dvd' | 'cd' | 'unknown';
+  mediaType?: 'dvd' | 'cd' | 'book' | 'unknown';
 }
 
 export type SortField = 'title' | 'author' | 'year' | 'isbn';
