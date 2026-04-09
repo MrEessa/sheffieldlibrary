@@ -1,6 +1,6 @@
 # Sheffield Library Browser
 
-A web app for browsing Sheffield Libraries' CD and DVD catalogue. Paste one or more RSS feed URLs from a Sheffield Libraries catalogue search and the app fetches, deduplicates, and displays all matching items in a searchable, sortable table - complete with cover art from TMDB (DVDs) and MusicBrainz / Cover Art Archive (CDs).
+A web app for browsing Sheffield Libraries' books, CD and DVD catalogue. Paste one or more RSS feed URLs from a Sheffield Libraries catalogue search and the app fetches, deduplicates, and displays all matching items in a searchable, sortable table - complete with cover art from TMDB (DVDs) and MusicBrainz / Cover Art Archive (CDs).
 
 ## Features
 
@@ -46,7 +46,10 @@ Paste the RSS URL into the input field and click **Load Feeds**. The "Load all r
 <img width="1042" height="782" alt="image" src="https://github.com/user-attachments/assets/2e6bbda0-8f5b-413d-86a2-36ab84577350" />
 <img width="1033" height="508" alt="image" src="https://github.com/user-attachments/assets/fc7ce726-3e9a-406a-8e73-f2655089982f" />
 <img width="1313" height="330" alt="image" src="https://github.com/user-attachments/assets/56e8240c-d87a-4938-93dd-dd2e6387b7e8" />
-<img width="1326" height="670" alt="image" src="https://github.com/user-attachments/assets/1f2574fa-90b0-4d3b-9f11-f014972ccd8a" />
+<img width="1315" height="883" alt="image" src="https://github.com/user-attachments/assets/f465d4e4-5b6b-4856-8f95-44a672b2d5a8" />
+<img width="1011" height="923" alt="image" src="https://github.com/user-attachments/assets/048dff0a-c16b-4f62-a169-3ec06e571c00" />
+
+
 
 
 ## License & Attribution
