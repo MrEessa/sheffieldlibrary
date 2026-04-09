@@ -164,8 +164,8 @@ serve(async (req) => {
       }
     } else if (mediaType === 'book') {
       for (let i = 0; i < titles.length; i++) {
-        const { title, author } = titles[i];
-        const coverUrl = await fetchOpenLibraryCover(title, author);
+        const { title, author, isbn } = titles[i];
+        const coverUrl = await fetchOpenLibraryCover(title, author, isbn);
         if (coverUrl) {
           covers[title] = coverUrl;
         }
