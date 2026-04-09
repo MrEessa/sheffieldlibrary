@@ -81,7 +81,7 @@ export function CDTable({ items, mediaType }: CDTableProps) {
   const totalPages = pageSize === 'all' ? 1 : Math.ceil(sortedItems.length / pageSize);
 
   // Fetch cover art for visible items
-  const { coverMap, isLoadingCovers } = useCoverArt(paginatedItems, mediaType);
+  const { coverMap, isLoadingCovers, coverKey } = useCoverArt(paginatedItems, mediaType);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
