@@ -115,7 +115,9 @@ export function CDTable({ items, mediaType }: CDTableProps) {
   }, [search]);
 
   const isDvd = mediaType === 'dvd';
-  const FallbackIcon = isDvd ? Film : Disc;
+  const isBook = mediaType === 'book';
+  const isPortrait = isDvd || isBook;
+  const FallbackIcon = isDvd ? Film : isBook ? BookOpen : Disc;
 
   if (items.length === 0) {
     return (
