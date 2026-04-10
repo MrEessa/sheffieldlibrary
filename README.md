@@ -28,7 +28,7 @@ A web app for browsing Sheffield Libraries' books, CD and DVD catalogue. Paste o
 
 You can add multiple RSS URLs (e.g. one for DVDs and one for CDs) - results are combined and deduplicated automatically.
 
-### 2. Load the catalogue
+### 2. Load the catalogue on https://sheffieldlibrary.lovable.app/
 
 Paste the RSS URL into the input field and click **Load Feeds**. The "Load all records" checkbox (on by default) fetches every page of results. For large collections this can take a minute or two.
 
