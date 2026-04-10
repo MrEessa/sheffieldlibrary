@@ -20,6 +20,20 @@ const Index = () => {
           </div>
         </div>
 
+        {/* How to use */}
+        <p className="text-sm font-medium text-foreground">
+          Search for books, CDs, or DVDs on{" "}
+          <a
+            href="https://library.sheffield.gov.uk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground transition-colors"
+          >
+            library.sheffield.gov.uk
+          </a>
+          , then copy the RSS feed link from the search results page and paste it below.
+        </p>
+
         {/* RSS Input Card */}
         <Card>
           <CardHeader className="pb-4">
