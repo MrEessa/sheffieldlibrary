@@ -40,6 +40,9 @@ Paste the RSS URL into the input field and click **Load Feeds**. The "Load all r
 - Click the link icon on any row to open the item in the Sheffield Libraries catalogue
 - Click **Export CSV** to download the current filtered results
 
+### 4. Place a hold on your chosen item
+
+- Voila!
 
 ## Screenshots Flow
 <img width="1019" height="559" alt="image" src="https://github.com/user-attachments/assets/d0a0a582-bb58-4a2d-871b-78cd8f00355b" />
