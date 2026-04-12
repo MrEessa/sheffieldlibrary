@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Progress } from '@/components/ui/progress';
 import { CDItem, SortField, SortDirection } from '@/types/cd-item';
 import { exportToCSV } from '@/utils/csv-export';
 import { useCoverArt } from '@/hooks/useCoverArt';
@@ -81,7 +82,7 @@ export function CDTable({ items, mediaType }: CDTableProps) {
   const totalPages = pageSize === 'all' ? 1 : Math.ceil(sortedItems.length / pageSize);
 
   // Fetch cover art for visible items
-  const { coverMap, isLoadingCovers, coverKey } = useCoverArt(paginatedItems, mediaType);
+  const { coverMap, isLoadingCovers, coverKey, coverProgress } = useCoverArt(paginatedItems, mediaType);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -175,6 +176,16 @@ export function CDTable({ items, mediaType }: CDTableProps) {
         -{Math.min(currentPage * (pageSize === 'all' ? sortedItems.length : pageSize), sortedItems.length)} of {sortedItems.length} items
         {search && ` (filtered from ${items.length} total)`}
       </div>
+
+      {/* Cover art loading progress */}
+      {isLoadingCovers && coverProgress && (
+        <div className="flex items-center gap-3 px-1">
+          <Progress value={(coverProgress.fetched / coverProgress.total) * 100} className="h-2 flex-1" />
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            Loading covers: {coverProgress.fetched}/{coverProgress.total}
+          </span>
+        </div>
+      )}
 
       {/* Table */}
       <div className="border rounded-lg overflow-hidden">
